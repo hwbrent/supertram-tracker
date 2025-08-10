@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { JSDOM } from 'jsdom';
 
 enum URLs {
     /** The page that says in plain english in the HTML what the routes are */
@@ -8,7 +9,12 @@ enum URLs {
 async function main(): Promise<void> {
     // get the homepage
     const response = await axios.get(URLs.ROUTES_HOMEPAGE);
-    console.log(response);
+
+    // parse it as html
+    const htmlString = response.data;
+    const dom = new JSDOM(htmlString);
+    const document = dom.window.document;
+    console.log(document.body.outerHTML);
 }
 
 main();
