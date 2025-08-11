@@ -21,7 +21,7 @@ async function main(): Promise<void> {
     // page for example. so we just have to do stuff like notice patterns in hrefs and
     // search for those and then find elements relative to those to get the
     // human-readable text
-    await page.goto(URLs.ROUTES_HOMEPAGE);
+    await page.goto(URLs.ROUTES_HOMEPAGE, { waitUntil: 'networkidle2' });
 
     // find the anchor tags that have hrefs that end in '/supertram/<route-name>-route'
     // as these are the links to the routes' pages
