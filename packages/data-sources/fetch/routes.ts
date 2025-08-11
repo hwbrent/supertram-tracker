@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { JSDOM } from 'jsdom';
+import puppeteer from 'puppeteer';
 
 enum URLs {
     PREFIX = 'https://www.travelsouthyorkshire.com/en-GB/supertram',
@@ -12,27 +11,28 @@ enum Headers {
 }
 
 async function main(): Promise<void> {
-    // get the homepage
-    const response = await axios.get(URLs.ROUTES_HOMEPAGE, {
-        headers: {
-            'User-Agent': Headers.USER_AGENT
-        }
-    });
+    // create browser and page
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
 
-    // parse it as html
-    const htmlString = response.data;
-    const dom = new JSDOM(htmlString);
-    const document = dom.window.document;
-
+    // go to the routes homepage.
     // this page has the info, but the HTML is not structured in a way that makes it easy
     // to scrape. it doesn't have classnames that delineate the different parts of the
     // page for example. so we just have to do stuff like notice patterns in hrefs and
     // search for those and then find elements relative to those to get the
     // human-readable text
+    await page.goto(URLs.ROUTES_HOMEPAGE);
 
-    // find the anchor tags which link to a route's specific page
-    const anchors = document.querySelectorAll('a[href*="/supertram/"][href$="-route"]');
-    console.log(anchors.length);
+    // find the anchor tags that have hrefs that end in '/supertram/<route-name>-route'
+    // as these are the links to the routes' pages
+    const routeLinks = await page.$$eval('a[href*="/supertram/"][href$="-route"]', (anchors) => {
+        const allHrefs = anchors.map(a => (a as HTMLAnchorElement).href);
+        const uniqueHrefs = new Set(allHrefs);
+        return uniqueHrefs;
+    });
+    console.log(routeLinks);
+
+    await browser.close();
 }
 
 main();
