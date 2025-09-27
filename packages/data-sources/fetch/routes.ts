@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
+import fs from 'fs';
 
 import type { Route } from './routes.d';
 
@@ -42,9 +43,23 @@ export default async function fetchRoutes(): Promise<Route[]> {
 }
 
 async function main() {
+    // scrape routes
     const routes = await fetchRoutes();
-    const string = JSON.stringify(routes, null, 4);
-    console.log('routes:\n', string);
+
+    // do nothing if no routes found
+    if (routes.length === 0) {
+        return;
+    }
+
+    // sort alphabetically by name
+    routes.sort((a, b) => a.name.localeCompare(b.name));
+
+    // write to file
+    const data = JSON.stringify(routes, null, 4);
+    const path = `${__dirname}/routes.json`;
+    fs.writeFileSync(path, data);
+
+    console.log('routes:\n', data);
 }
 
 if (require.main === module) {

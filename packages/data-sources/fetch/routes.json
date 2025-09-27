@@ -1,0 +1,22 @@
+[
+    {
+        "href": "/services/blue-malin-bridge-cathedral",
+        "name": "BLUE",
+        "description": "Halfway - Malin Bridge or Shalesmoor"
+    },
+    {
+        "href": "/services/purp-park-hill-sheffield-herdings",
+        "name": "PURP",
+        "description": "Herdings Park - Cathedral"
+    },
+    {
+        "href": "/services/tt-sheffield-parkgate",
+        "name": "TT",
+        "description": "Parkgate - Cathedral (Sheffield)"
+    },
+    {
+        "href": "/services/yell-meadowhall-sheffield-middlewood",
+        "name": "YELL",
+        "description": "Meadowhall - Middlewood or Shalesmoor"
+    }
+]
