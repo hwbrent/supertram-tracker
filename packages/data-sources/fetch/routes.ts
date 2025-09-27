@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer';
+import axios from 'axios';
+import { JSDOM } from 'jsdom';
 
 import type { Route } from './routes.d';
 
@@ -15,34 +16,27 @@ enum URLs {
  * @summary Fetches a list of route data
  */
 export default async function getRoutes(): Promise<Route[]> {
-    // create browser and page
-    const browser = await puppeteer.launch({ headless: false });
-    const page = await browser.newPage();
+    const response = await axios.get(URLs.ROUTES_HOMEPAGE);
+    const htmlString = response.data;
+    const dom = new JSDOM(htmlString);
+    const document = dom.window.document;
 
-    // go to the routes homepage
-    await page.goto(URLs.ROUTES_HOMEPAGE, { waitUntil: 'networkidle2' });
+    // There's a <ul> containing the routes called "services"
+    const [services] = document.getElementsByClassName('services');
 
-    // Run DOM code in the browser context
-    const results = await page.evaluate(() => {
-        // There's a <ul> containing the routes called "services"
-        const [services] = document.getElementsByClassName('services');
+    // Within the <ul> is a list of items, where each item is a route
+    const lis = Array.from(services?.children || []);
+    const results = lis.map((li) => {
+        // Each route has an anchor tag, within which there's obviously an href, but
+        // also the name and description of the route
+        const [anchor] = li.getElementsByTagName('a');
+        const href = anchor?.href || '';
+        const name = li.getElementsByClassName('name')[0]?.textContent?.trim()|| '';
+        const description = li.getElementsByClassName('description')[0]?.textContent?.trim() || '';
 
-        // Within the <ul> is a list of items, where each item is a route
-        const lis = Array.from(services?.children || []);
-        return lis.map((li) => {
-            // Each route has an anchor tag, within which there's obviously an href, but
-            // also the name and description of the route
-            const [anchor] = li.getElementsByTagName('a');
-            const href = anchor?.href || '';
-            const name = li.getElementsByClassName('name')[0]?.textContent?.trim()|| '';
-            const description = li.getElementsByClassName('description')[0]?.textContent?.trim() || '';
-
-            const routeObj: Route = { href, name, description };
-            return routeObj;
-        });
+        const routeObj: Route = { href, name, description };
+        return routeObj;
     });
-
-    await browser.close();
 
     return results;
 }
