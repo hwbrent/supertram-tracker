@@ -24,10 +24,15 @@ enum ClassNames {
     DESCRIPTION = 'description'
 }
 
+/** @enum {string} */
+const Paths = {
+    JSON: __dirname + '/routes.json'
+};
+
 /**
  * @summary Fetches a list of route data
  */
-export default async function fetchRoutes(): Promise<Route[]> {
+export async function fetchRoutes(): Promise<Route[]> {
     const response = await axios.get(URLs.ROUTES_HOMEPAGE);
     const htmlString = response.data;
     const dom = new JSDOM(htmlString);
@@ -54,6 +59,15 @@ export default async function fetchRoutes(): Promise<Route[]> {
     });
 
     return results;
+}
+
+/**
+ * @returns routes from the JSON file
+ */
+export default function getRoutes(): Route[] {
+    const data = fs.readFileSync(Paths.JSON, 'utf-8');
+    const routes = JSON.parse(data);
+    return routes;
 }
 
 async function main() {
