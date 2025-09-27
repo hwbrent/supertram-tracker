@@ -1,36 +1,40 @@
 import puppeteer from 'puppeteer';
 
 enum URLs {
-    PREFIX = 'https://www.travelsouthyorkshire.com/en-GB/supertram',
-    /** The page that says in plain english in the HTML what the routes are */
-    ROUTES_HOMEPAGE = URLs.PREFIX + '/supertram-network-and-routes'
+    /** The page that has hrefs to the routes */
+    ROUTES_HOMEPAGE = 'https://bustimes.org/operators/south-yorkhire-future-tram'
 };
-
-enum Headers {
-    USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:141.0) Gecko/20100101 Firefox/141.0'
-}
 
 async function main(): Promise<void> {
     // create browser and page
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
-    // go to the routes homepage.
-    // this page has the info, but the HTML is not structured in a way that makes it easy
-    // to scrape. it doesn't have classnames that delineate the different parts of the
-    // page for example. so we just have to do stuff like notice patterns in hrefs and
-    // search for those and then find elements relative to those to get the
-    // human-readable text
+    // go to the routes homepage
     await page.goto(URLs.ROUTES_HOMEPAGE, { waitUntil: 'networkidle2' });
 
-    // find the anchor tags that have hrefs that end in '/supertram/<route-name>-route'
-    // as these are the links to the routes' pages
-    const routeLinks = await page.$$eval('a[href*="/supertram/"][href$="-route"]', (anchors) => {
-        const allHrefs = anchors.map(a => (a as HTMLAnchorElement).href);
-        const uniqueHrefs = new Set(allHrefs);
-        return uniqueHrefs;
+    // Run DOM code in the browser context
+    const results = await page.evaluate(() => {
+        // There's a <ul> containing the routes called "services"
+        const [services] = document.getElementsByClassName('services');
+
+        // Within the <ul> is a list of items, where each item is a route
+        const lis = Array.from(services?.children || []);
+        return lis.map((li) => {
+            // Each route has an anchor tag, within which there's obviously an href, but
+            // also the name and description of the route
+            const [anchor] = li.getElementsByTagName('a');
+            const href = anchor?.href || '';
+            const name = li.getElementsByClassName('name')[0]?.textContent?.trim()|| '';
+            const description = li.getElementsByClassName('description')[0]?.textContent?.trim() || '';
+            return { href, name, description };
+        });
     });
-    console.log(routeLinks);
+
+    // Print results
+    results.forEach(({ href, name, description }) => {
+        console.log(href, name, description);
+    });
 
     await browser.close();
 }
