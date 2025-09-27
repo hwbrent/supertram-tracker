@@ -15,7 +15,7 @@ enum URLs {
 /**
  * @summary Fetches a list of route data
  */
-export default async function getRoutes(): Promise<Route[]> {
+export default async function fetchRoutes(): Promise<Route[]> {
     const response = await axios.get(URLs.ROUTES_HOMEPAGE);
     const htmlString = response.data;
     const dom = new JSDOM(htmlString);
@@ -42,7 +42,7 @@ export default async function getRoutes(): Promise<Route[]> {
 }
 
 async function main() {
-    const routes = await getRoutes();
+    const routes = await fetchRoutes();
     const string = JSON.stringify(routes, null, 4);
     console.log('routes:\n', string);
 }
