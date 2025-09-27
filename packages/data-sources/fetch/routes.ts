@@ -47,4 +47,6 @@ export default async function main(): Promise<void> {
     await browser.close();
 }
 
-main();
+if (require.main === module) {
+    main();
+}
