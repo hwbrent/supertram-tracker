@@ -1,5 +1,7 @@
 import puppeteer from 'puppeteer';
 
+import type { Route } from './routes.d';
+
 enum URLs {
     /**
      * The page that has hrefs to the routes
@@ -31,7 +33,9 @@ export default async function main(): Promise<void> {
             const href = anchor?.href || '';
             const name = li.getElementsByClassName('name')[0]?.textContent?.trim()|| '';
             const description = li.getElementsByClassName('description')[0]?.textContent?.trim() || '';
-            return { href, name, description };
+
+            const routeObj: Route = { href, name, description };
+            return routeObj;
         });
     });
 
