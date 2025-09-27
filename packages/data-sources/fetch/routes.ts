@@ -49,8 +49,8 @@ export default async function fetchRoutes(): Promise<Route[]> {
         // create a full URL
         const url = new URL(href, URLs.BASE);
 
-        const routeObj: Route = { href, url, name, description };
-        return routeObj;
+        const route: Route = { href, url, name, description };
+        return route;
     });
 
     return results;
