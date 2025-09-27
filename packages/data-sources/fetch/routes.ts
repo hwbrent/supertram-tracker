@@ -1,7 +1,11 @@
 import puppeteer from 'puppeteer';
 
 enum URLs {
-    /** The page that has hrefs to the routes */
+    /**
+     * The page that has hrefs to the routes
+     *
+     * (Yes the actual URL has a spelling error "yorkhire")
+     */
     ROUTES_HOMEPAGE = 'https://bustimes.org/operators/south-yorkhire-future-tram'
 };
 
