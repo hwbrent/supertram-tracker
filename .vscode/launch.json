@@ -11,6 +11,7 @@
             "name": "Execute script",
             "runtimeExecutable": "npx",
             "runtimeArgs": ["ts-node", "${file}"],
+            "runtimeVersion": "20.18.0",
             "skipFiles": ["<node_internals>/**"]
         }
     ]
