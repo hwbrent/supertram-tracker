@@ -11,7 +11,10 @@ enum URLs {
     ROUTES_HOMEPAGE = 'https://bustimes.org/operators/south-yorkhire-future-tram'
 };
 
-export default async function main(): Promise<void> {
+/**
+ * @summary Fetches a list of route data
+ */
+export default async function getRoutes(): Promise<Route[]> {
     // create browser and page
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -39,12 +42,15 @@ export default async function main(): Promise<void> {
         });
     });
 
-    // Print results
-    results.forEach(({ href, name, description }) => {
-        console.log(href, name, description);
-    });
-
     await browser.close();
+
+    return results;
+}
+
+async function main() {
+    const routes = await getRoutes();
+    const string = JSON.stringify(routes, null, 4);
+    console.log('routes:\n', string);
 }
 
 if (require.main === module) {
