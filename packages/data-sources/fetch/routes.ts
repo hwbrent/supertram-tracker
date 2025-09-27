@@ -5,7 +5,7 @@ enum URLs {
     ROUTES_HOMEPAGE = 'https://bustimes.org/operators/south-yorkhire-future-tram'
 };
 
-async function main(): Promise<void> {
+export default async function main(): Promise<void> {
     // create browser and page
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
