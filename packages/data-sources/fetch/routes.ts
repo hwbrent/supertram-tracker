@@ -5,12 +5,14 @@ import fs from 'fs';
 import type { Route } from './routes.d';
 
 enum URLs {
+    /** The base URL of the site */
+    BASE = "https://bustimes.org",
     /**
      * The page that has hrefs to the routes
      *
      * (Yes the actual URL has a spelling error "yorkhire")
      */
-    ROUTES_HOMEPAGE = 'https://bustimes.org/operators/south-yorkhire-future-tram'
+    ROUTES_HOMEPAGE = URLs.BASE + '/operators/south-yorkhire-future-tram'
 };
 
 /**
@@ -35,7 +37,10 @@ export default async function fetchRoutes(): Promise<Route[]> {
         const name = li.getElementsByClassName('name')[0]?.textContent?.trim()|| '';
         const description = li.getElementsByClassName('description')[0]?.textContent?.trim() || '';
 
-        const routeObj: Route = { href, name, description };
+        // create a full URL
+        const url = new URL(href, URLs.BASE);
+
+        const routeObj: Route = { href, url, name, description };
         return routeObj;
     });
 

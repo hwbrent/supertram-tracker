@@ -13,10 +13,15 @@ type Route = {
      */
     description: string;
     /**
-     * @summary The full URL that leads to more details about the route (timetable etc)
-     * @example "https://bustimes.org/services/purp-park-hill-sheffield-herdings"
+     * @summary The partial URL that leads to more details about the route (timetable etc)
+     * @example "/services/purp-park-hill-sheffield-herdings"
      */
     href: string;
+    /**
+     * @summary The full URL corresponding to `href`
+     * @example "https://bustimes.org/services/purp-park-hill-sheffield-herdings"
+     */
+    url: URL;
 }
 
 export type { Route };
