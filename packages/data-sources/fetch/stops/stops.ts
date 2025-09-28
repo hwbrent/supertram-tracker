@@ -3,6 +3,7 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 
 import type { Route } from '../routes/routes.d';
+import type { Stop, Direction } from '../stops/stops.d';
 import { Stops as ClassNames } from '../../utils/classNames';
 import { Routes as RoutesURLs } from '../../utils/urls';
 
@@ -10,7 +11,7 @@ import { Routes as RoutesURLs } from '../../utils/urls';
  * @summary Given a route, this function fetches its list of stops, grouped by direction
  * @param route the route to fetch stops for
  */
-async function fetchStops(route: Route) {
+async function fetchStops(route: Route): Promise<Direction[]> {
     const { url } = route;
     const response = await axios.get(url.toString());
     const htmlString = response.data;
@@ -48,7 +49,7 @@ async function fetchStops(route: Route) {
                 // get an absolute URL from the href
                 const url = new URL(href, RoutesURLs.BASE);
 
-                const stop = { name, href, url };
+                const stop: Stop = { name, href, url };
                 return stop;
             })
             .filter(Boolean);
