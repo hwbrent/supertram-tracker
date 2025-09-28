@@ -50,6 +50,7 @@ async function fetchStops(route: Route): Promise<Direction[]> {
                 const url = new URL(href, RoutesURLs.BASE);
 
                 const stop: Stop = { name, href, url };
+                augmentStop(stop);
                 return stop;
             })
             .filter((stop): stop is Stop => stop !== null);
@@ -63,6 +64,60 @@ async function fetchStops(route: Route): Promise<Direction[]> {
     });
 
     return directions;
+}
+
+/**
+ * @summary Augments a stop in-place with additional data
+ * @param stop the stop to augment
+ */
+async function augmentStop(stop: Stop): Promise<void> {
+    const { url } = stop;
+    const response = await axios.get(url.toString());
+    const htmlString = response.data;
+    const dom = new JSDOM(htmlString);
+    const document = dom.window.document;
+
+    // get the div containing the main data
+    const content = document.getElementById('content');
+
+    // sanity check to confirm the names match
+    const name = content?.getElementsByTagName('h1')[0]?.textContent?.trim() || '';
+    console.assert(name === stop.name, `Stop name mismatch: ${name} !== ${stop.name}`);
+
+    // get the description of where the stop is located
+    const description = content?.getElementsByTagName('p')[0]?.textContent?.trim() || '';
+
+    // get the horizontal list of other info
+    // @ts-ignore
+    const [ul] = content.getElementsByTagName('ul');
+    const lis = ul.children;
+    const [ mapLi, streetViewLi, naptanLi, atcoLi ] = lis;
+
+    // ignore the first <li> - it's a link to the stop in bustimes.org's proprietary map.
+    // we want to use google maps instead
+
+    // get the street view link
+    const streetViewA = streetViewLi.getElementsByTagName('a')[0];
+    const streetViewHref = streetViewA?.href || '';
+    const streetViewUrl = new URL(streetViewHref);
+
+    // get the NaPTAN code
+    const NaPTAN = naptanLi?.textContent?.trim() || '';
+
+    // get the ATCO code
+    const ATCO = atcoLi?.textContent?.trim() || '';
+
+    // extrapolate the latitude and longitude from the street view URL
+    const params = streetViewUrl.searchParams;
+    const coords = params.get('cbll') || '';
+    const [latitude, longitude] = coords.split(',');
+
+    stop.description = description;
+    stop.streetViewUrl = streetViewUrl;
+    stop.NaPTAN = NaPTAN;
+    stop.ATCO = ATCO;
+    stop.latitude = latitude;
+    stop.longitude = longitude;
 }
 
 async function main() {
