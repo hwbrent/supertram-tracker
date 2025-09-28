@@ -21,20 +21,23 @@ async function fetchStops(route: Route): Promise<Direction[]> {
     const groupings = Array.from(document.getElementsByClassName(ClassNames.GROUPING));
 
     const directions = await Promise.all(groupings.map(async (grouping) => {
-        // get the title, and from it the termini of the route
+        // get the termini of the route. it's in an <h2> at the top of the grouping
         const [h2] = grouping.getElementsByTagName('h2');
         const title = h2?.textContent?.trim() || '';
         const [from, to] = title.split(' - ').map((s) => s.trim());
 
+        // get the timetable <table>. it has schedule info, but we don't bother with that
+        // right now cos it can become out-of-date quickly, so we just grab the static
+        // stop info
         const [timetable] = grouping.getElementsByClassName(ClassNames.TIMETABLE);
         const trs = Array.from(timetable.getElementsByTagName('tr'));
 
-        // get the basic stop data from the current page
+        // each row in the table pertains to a separate stop (barring a few rows which)
+        // are hidden), so map each row to a Stop object
         const basicStops = trs.map((tr) => {
-            // skip hidden rows in the table
             const isHidden = tr.classList.contains('minor');
             if (isHidden) {
-                return null;
+                return;
             }
 
             // get the <th>. this is what contains the data we want
@@ -63,11 +66,7 @@ async function fetchStops(route: Route): Promise<Direction[]> {
             });
         const stops = await Promise.all(promises);
 
-        const direction = {
-            from,
-            to,
-            stops
-        };
+        const direction = { from, to, stops };
         return direction;
     }));
 
@@ -88,24 +87,20 @@ async function augmentStop(stop: Stop): Promise<void> {
     // get the div containing the main data
     const content = document.getElementById('content');
 
-    // console.log(content?.outerHTML);
-    // console.log('');
-
-    // sanity check to confirm the names match
+    // (sanity check to confirm the names match)
     const name = content?.getElementsByTagName('h1')[0]?.textContent?.trim() || '';
     console.assert(name === stop.name, `Stop name mismatch: ${name} !== ${stop.name}`);
 
     // get the description of where the stop is located
-    const description = content?.getElementsByTagName('p')[0]?.textContent?.trim() || '';
+    const description: Stop['description'] = content?.getElementsByTagName('p')[0]?.textContent?.trim() || '';
 
     // get the horizontal list of other info
+    // (ignore the first <li> - it's a link to the stop in bustimes.org's proprietary map.
+    // we want to use google maps instead)
     // @ts-ignore
     const [ul] = content.getElementsByTagName('ul');
     const lis = ul.children;
-    const [ mapLi, streetViewLi, naptanLi, atcoLi ] = lis;
-
-    // ignore the first <li> - it's a link to the stop in bustimes.org's proprietary map.
-    // we want to use google maps instead
+    const [ _, streetViewLi, naptanLi, atcoLi ] = lis;
 
     // get the street view link
     const streetViewA = streetViewLi.getElementsByTagName('a')[0];
@@ -123,8 +118,7 @@ async function augmentStop(stop: Stop): Promise<void> {
     const coords = params.get('cbll') || '';
     const [latitude, longitude] = coords.split(',');
 
-    // console.log(stop, description, streetViewUrl, NaPTAN, ATCO, latitude, longitude);
-
+    // add the values to the stop object
     stop.description = description;
     stop.streetViewUrl = streetViewUrl;
     stop.NaPTAN = NaPTAN;
