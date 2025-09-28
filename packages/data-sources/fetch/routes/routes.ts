@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { JSDOM } from 'jsdom';
 import fs from 'fs';
 
 import type { Route } from './routes.d';
 import { Routes as URLs } from '../../utils/urls';
 import { Routes as ClassNames } from '../../utils/classNames';
+import { fetchDocument } from '../../utils/helpers';
 
 /** @enum {string} */
 const Paths = {
@@ -15,10 +14,7 @@ const Paths = {
  * @summary Fetches a list of route data
  */
 export async function fetchRoutes(): Promise<Route[]> {
-    const response = await axios.get(URLs.HOMEPAGE);
-    const htmlString = response.data;
-    const dom = new JSDOM(htmlString);
-    const document = dom.window.document;
+    const document = await fetchDocument(URLs.HOMEPAGE);
 
     // There's a <ul> containing the routes called "services"
     const [services] = document.getElementsByClassName(ClassNames.SERVICES);

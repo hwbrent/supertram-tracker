@@ -1,22 +1,15 @@
-import axios from 'axios';
-import { JSDOM } from 'jsdom';
-import fs from 'fs';
-
 import type { Route } from '../routes/routes.d';
 import type { Stop, Direction } from './stops.d';
 import { Stops as ClassNames } from '../../utils/classNames';
 import { Routes as RoutesURLs } from '../../utils/urls';
+import { fetchDocument } from '../../utils/helpers';
 
 /**
  * @summary Given a route, this function fetches its list of stops, grouped by direction
  * @param route the route to fetch stops for
  */
 async function fetchStops(route: Route): Promise<Direction[]> {
-    const { url } = route;
-    const response = await axios.get(url.toString());
-    const htmlString = response.data;
-    const dom = new JSDOM(htmlString);
-    const document = dom.window.document;
+    const document = await fetchDocument(route.url);
 
     const groupings = Array.from(document.getElementsByClassName(ClassNames.GROUPING));
 
@@ -78,11 +71,7 @@ async function fetchStops(route: Route): Promise<Direction[]> {
  * @param stop the stop to augment
  */
 async function augmentStop(stop: Stop): Promise<void> {
-    const { url } = stop;
-    const response = await axios.get(url.toString());
-    const htmlString = response.data;
-    const dom = new JSDOM(htmlString);
-    const document = dom.window.document;
+    const document = await fetchDocument(stop.url);
 
     // get the div containing the main data
     const content = document.getElementById('content');
