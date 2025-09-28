@@ -29,37 +29,39 @@ async function fetchStops(route: Route): Promise<Direction[]> {
         const [timetable] = grouping.getElementsByClassName(ClassNames.TIMETABLE);
         const trs = Array.from(timetable.getElementsByTagName('tr'));
 
-        const stops = await Promise.all(
-            trs
-                .map((tr) => {
-                    // skip hidden rows in the table
-                    const isHidden = tr.classList.contains('minor');
-                    if (isHidden) {
-                        return null;
-                    }
+        // get the basic stop data from the current page
+        const basicStops = trs.map((tr) => {
+            // skip hidden rows in the table
+            const isHidden = tr.classList.contains('minor');
+            if (isHidden) {
+                return null;
+            }
 
-                    // get the <th>. this is what contains the data we want
-                    const [th] = tr.getElementsByTagName('th');
+            // get the <th>. this is what contains the data we want
+            const [th] = tr.getElementsByTagName('th');
 
-                    // get the name of the stop
-                    const name = th.textContent?.trim() || '';
+            // get the name of the stop
+            const name = th.textContent?.trim() || '';
 
-                    // get the href to the stop's page
-                    const [a] = th.getElementsByTagName('a');
-                    const href = a?.href || '';
+            // get the href to the stop's page
+            const [a] = th.getElementsByTagName('a');
+            const href = a?.href || '';
 
-                    // get an absolute URL from the href
-                    const url = new URL(href, RoutesURLs.BASE);
+            // get an absolute URL from the href
+            const url = new URL(href, RoutesURLs.BASE);
 
-                    const stop: Stop = { name, href, url };
-                    return stop;
-                })
-                .filter((stop): stop is Stop => stop !== null)
-                .map(async (stop) => {
-                    await augmentStop(stop);
-                    return stop;
-                })
-        );
+            const stop: Stop = { name, href, url };
+            return stop;
+        });
+
+        // filter the nulls, and fetch additional data for each stop
+        const promises = basicStops
+            .filter((stop): stop is Stop => stop !== null)
+            .map(async (stop) => {
+                await augmentStop(stop);
+                return stop
+            });
+        const stops = await Promise.all(promises);
 
         const direction = {
             from,
