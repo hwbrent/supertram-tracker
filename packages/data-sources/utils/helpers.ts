@@ -1,3 +1,8 @@
+/**
+ * @summary Contains helper functions used across the various modules in the codebase
+ * @module helpers
+ */
+
 // ===============
 // === Imports ===
 // ===============
