@@ -4,6 +4,7 @@ import fs from 'fs';
 
 import type { Route } from '../routes/routes.d';
 import { Stops as ClassNames } from '../../utils/classNames';
+import { Routes as RoutesURLs } from '../../utils/urls';
 
 /**
  * 
@@ -44,7 +45,10 @@ async function fetchStops(route: Route) {
                 const [a] = th.getElementsByTagName('a');
                 const href = a?.href || '';
 
-                const stop = { name, href };
+                // get an absolute URL from the href
+                const url = new URL(href, RoutesURLs.BASE);
+
+                const stop = { name, href, url };
                 return stop;
             })
             .filter(Boolean);
