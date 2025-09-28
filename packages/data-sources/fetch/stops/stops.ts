@@ -1,3 +1,9 @@
+/**
+ * @summary Dedicated to grabbing data relating to the various stops on each route's
+ * directions
+ * @module stops
+ */
+
 import type { Route } from '../routes/routes.d';
 import { Routes as RoutesURLs } from '../../utils/urls';
 

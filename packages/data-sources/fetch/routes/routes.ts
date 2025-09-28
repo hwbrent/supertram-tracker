@@ -1,3 +1,8 @@
+/**
+ * @summary Dedicated to grabbing data relating to the various tram routes
+ * @module routes
+ */
+
 import fs from 'fs';
 
 import type { Route } from './routes.d';
