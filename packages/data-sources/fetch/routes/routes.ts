@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 
 import type { Route } from './routes.d';
-import { URLs } from '../../utils/consts';
+import { Routes as URLs } from '../../utils/urls';
 import { Routes as ClassNames } from '../../utils/classNames';
 
 /** @enum {string} */
@@ -15,7 +15,7 @@ const Paths = {
  * @summary Fetches a list of route data
  */
 export async function fetchRoutes(): Promise<Route[]> {
-    const response = await axios.get(URLs.ROUTES_HOMEPAGE);
+    const response = await axios.get(URLs.HOMEPAGE);
     const htmlString = response.data;
     const dom = new JSDOM(htmlString);
     const document = dom.window.document;
@@ -34,7 +34,7 @@ export async function fetchRoutes(): Promise<Route[]> {
         const description = li.getElementsByClassName(ClassNames.DESCRIPTION)[0]?.textContent?.trim() || '';
 
         // create a full URL
-        const url = new URL(href, URLs.ROUTES_BASE);
+        const url = new URL(href, URLs.BASE);
 
         const route: Route = { href, url, name, description };
         return route;
