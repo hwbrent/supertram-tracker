@@ -4,6 +4,10 @@
  * @module stops
  */
 
+// ===============
+// === Imports ===
+// ===============
+
 import type { Route } from '../routes/routes.d';
 import { Routes as RoutesURLs } from '../../utils/urls';
 
@@ -11,6 +15,10 @@ import type { Stop, Direction } from './stops.d';
 import { Stops as ClassNames } from '../../utils/classNames';
 
 import { fetchDocument } from '../../utils/helpers';
+
+// =================
+// === Functions ===
+// =================
 
 /**
  * @summary Given a route, this function fetches its list of stops, grouped by direction
@@ -127,6 +135,10 @@ async function augmentStop(stop: Stop): Promise<void> {
     stop.latitude = latitude;
     stop.longitude = longitude;
 }
+
+// ============
+// === Main ===
+// ============
 
 async function main() {
     const route: Route = {

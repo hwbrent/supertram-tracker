@@ -1,5 +1,13 @@
+// ===============
+// === Imports ===
+// ===============
+
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
+
+// =================
+// === Functions ===
+// =================
 
 /**
  * @summary Fetches the page at the given URL and returns it as a Document

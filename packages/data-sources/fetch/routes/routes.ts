@@ -3,6 +3,10 @@
  * @module routes
  */
 
+// ===============
+// === Imports ===
+// ===============
+
 import fs from 'fs';
 
 import type { Route } from './routes.d';
@@ -11,10 +15,18 @@ import { Routes as ClassNames } from '../../utils/classNames';
 
 import { fetchDocument } from '../../utils/helpers';
 
+// =============
+// === Enums ===
+// =============
+
 /** @enum {string} */
 const Paths = {
     JSON: __dirname + '/routes.json'
 };
+
+// =================
+// === Functions ===
+// =================
 
 /**
  * @summary Fetches a list of route data
@@ -53,6 +65,10 @@ export default function getRoutes(): Route[] {
     const routes = JSON.parse(data);
     return routes;
 }
+
+// ============
+// === Main ===
+// ============
 
 async function main() {
     // scrape routes
