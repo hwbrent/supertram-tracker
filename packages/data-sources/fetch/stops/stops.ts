@@ -7,7 +7,7 @@ import { Stops as ClassNames } from '../../utils/classNames';
 import { Routes as RoutesURLs } from '../../utils/urls';
 
 /**
- * 
+ * @summary Given a route, this function fetches its list of stops, grouped by direction
  * @param route the route to fetch stops for
  */
 async function fetchStops(route: Route) {
