@@ -3,26 +3,7 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 
 import type { Route } from './routes.d';
-
-enum URLs {
-    /** The base URL of the site */
-    BASE = "https://bustimes.org",
-    /**
-     * The page that has hrefs to the routes
-     *
-     * (Yes the actual URL has a spelling error "yorkhire")
-     */
-    ROUTES_HOMEPAGE = URLs.BASE + '/operators/south-yorkhire-future-tram'
-};
-
-enum ClassNames {
-    /** `<ul>` where each `<li>` contains info relating to an individual route */
-    SERVICES = 'services',
-    /** Unique `<strong>` within a `<span>` within the `<li>` */
-    NAME = 'name',
-    /** Unique `<span>` within the `<li>` */
-    DESCRIPTION = 'description'
-}
+import { URLs, ClassNames } from '../../utils/consts';
 
 /** @enum {string} */
 const Paths = {
@@ -39,7 +20,7 @@ export async function fetchRoutes(): Promise<Route[]> {
     const document = dom.window.document;
 
     // There's a <ul> containing the routes called "services"
-    const [services] = document.getElementsByClassName(ClassNames.SERVICES);
+    const [services] = document.getElementsByClassName(ClassNames.ROUTES_SERVICES);
 
     // Within the <ul> is a list of items, where each item is a route
     const lis = Array.from(services?.children || []);
@@ -48,11 +29,11 @@ export async function fetchRoutes(): Promise<Route[]> {
         // also the name and description of the route
         const [anchor] = li.getElementsByTagName('a');
         const href = anchor?.href || '';
-        const name = li.getElementsByClassName(ClassNames.NAME)[0]?.textContent?.trim()|| '';
-        const description = li.getElementsByClassName(ClassNames.DESCRIPTION)[0]?.textContent?.trim() || '';
+        const name = li.getElementsByClassName(ClassNames.ROUTES_NAME)[0]?.textContent?.trim()|| '';
+        const description = li.getElementsByClassName(ClassNames.ROUTES_DESCRIPTION)[0]?.textContent?.trim() || '';
 
         // create a full URL
-        const url = new URL(href, URLs.BASE);
+        const url = new URL(href, URLs.ROUTES_BASE);
 
         const route: Route = { href, url, name, description };
         return route;
