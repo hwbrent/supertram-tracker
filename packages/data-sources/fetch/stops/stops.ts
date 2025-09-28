@@ -20,7 +20,7 @@ async function fetchStops(route: Route): Promise<Direction[]> {
 
     const groupings = Array.from(document.getElementsByClassName(ClassNames.GROUPING));
 
-    const directions = groupings.map((grouping) => {
+    const directions = await Promise.all(groupings.map(async (grouping) => {
         // get the title, and from it the termini of the route
         const [h2] = grouping.getElementsByTagName('h2');
         const title = h2?.textContent?.trim() || '';
@@ -28,32 +28,38 @@ async function fetchStops(route: Route): Promise<Direction[]> {
 
         const [timetable] = grouping.getElementsByClassName(ClassNames.TIMETABLE);
         const trs = Array.from(timetable.getElementsByTagName('tr'));
-        const stops = trs
-            .map((tr) => {
-                // skip hidden rows in the table
-                const isHidden = tr.classList.contains('minor');
-                if (isHidden) {
-                    return null;
-                }
 
-                // get the <th>. this is what contains the data we want
-                const [th] = tr.getElementsByTagName('th');
+        const stops = await Promise.all(
+            trs
+                .map((tr) => {
+                    // skip hidden rows in the table
+                    const isHidden = tr.classList.contains('minor');
+                    if (isHidden) {
+                        return null;
+                    }
 
-                // get the name of the stop
-                const name = th.textContent?.trim() || '';
+                    // get the <th>. this is what contains the data we want
+                    const [th] = tr.getElementsByTagName('th');
 
-                // get the href to the stop's page
-                const [a] = th.getElementsByTagName('a');
-                const href = a?.href || '';
+                    // get the name of the stop
+                    const name = th.textContent?.trim() || '';
 
-                // get an absolute URL from the href
-                const url = new URL(href, RoutesURLs.BASE);
+                    // get the href to the stop's page
+                    const [a] = th.getElementsByTagName('a');
+                    const href = a?.href || '';
 
-                const stop: Stop = { name, href, url };
-                augmentStop(stop);
-                return stop;
-            })
-            .filter((stop): stop is Stop => stop !== null);
+                    // get an absolute URL from the href
+                    const url = new URL(href, RoutesURLs.BASE);
+
+                    const stop: Stop = { name, href, url };
+                    return stop;
+                })
+                .filter((stop): stop is Stop => stop !== null)
+                .map(async (stop) => {
+                    await augmentStop(stop);
+                    return stop;
+                })
+        );
 
         const direction = {
             from,
@@ -61,7 +67,7 @@ async function fetchStops(route: Route): Promise<Direction[]> {
             stops
         };
         return direction;
-    });
+    }));
 
     return directions;
 }
@@ -79,6 +85,9 @@ async function augmentStop(stop: Stop): Promise<void> {
 
     // get the div containing the main data
     const content = document.getElementById('content');
+
+    // console.log(content?.outerHTML);
+    // console.log('');
 
     // sanity check to confirm the names match
     const name = content?.getElementsByTagName('h1')[0]?.textContent?.trim() || '';
@@ -111,6 +120,8 @@ async function augmentStop(stop: Stop): Promise<void> {
     const params = streetViewUrl.searchParams;
     const coords = params.get('cbll') || '';
     const [latitude, longitude] = coords.split(',');
+
+    // console.log(stop, description, streetViewUrl, NaPTAN, ATCO, latitude, longitude);
 
     stop.description = description;
     stop.streetViewUrl = streetViewUrl;
