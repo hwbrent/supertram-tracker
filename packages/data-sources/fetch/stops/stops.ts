@@ -37,7 +37,7 @@ async function fetchStops(route: Route): Promise<Direction[]> {
         const basicStops = trs.map((tr) => {
             const isHidden = tr.classList.contains('minor');
             if (isHidden) {
-                return;
+                return null;
             }
 
             // get the <th>. this is what contains the data we want
@@ -114,12 +114,16 @@ async function augmentStop(stop: Stop): Promise<void> {
     const ATCO = atcoLi?.textContent?.trim() || '';
 
     // extrapolate the latitude and longitude from the street view URL
-    const params = streetViewUrl.searchParams;
-    const coords = params.get('cbll') || '';
+    const coords = streetViewUrl.searchParams.get('cbll') || '';
     const [latitude, longitude] = coords.split(',');
+
+    // use the lat+long to create a non-streetview google maps url
+    const googleMapsUrl = new URL('https://www.google.com/maps');
+    googleMapsUrl.searchParams.set('q', coords);
 
     // add the values to the stop object
     stop.description = description;
+    stop.googleMapsUrl = googleMapsUrl;
     stop.streetViewUrl = streetViewUrl;
     stop.NaPTAN = NaPTAN;
     stop.ATCO = ATCO;

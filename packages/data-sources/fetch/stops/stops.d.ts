@@ -20,6 +20,11 @@ export type Stop = {
      */
     description?: string;
     /**
+     * @summary A Google Maps URL for the stop
+     * @example "https://www.google.com/maps?layer=c&cbll=53.3285345,-1.3443136"
+     */
+    googleMapsUrl?: URL;
+    /**
      * @summary A Google Street View URL showing the stop
      * @example "https://www.google.com/maps?layer=c&cbll=53.3285345,-1.3443136"
      */
