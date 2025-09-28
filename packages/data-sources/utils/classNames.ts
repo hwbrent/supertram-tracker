@@ -1,3 +1,10 @@
+/**
+ * @summary A file containing enums containing classnames pertaining to each other module
+ * in the codebase
+ * @module classNames
+ */
+
+/** @see {@link module:routes} */
 export enum Routes {
     /** `<ul>` where each `<li>` contains info relating to an individual route */
     SERVICES = 'services',
@@ -7,6 +14,7 @@ export enum Routes {
     DESCRIPTION = 'description',
 };
 
+/** @see {@link module:stops} */
 export enum Stops {
     /** `<div>` pertaining to a direction (e.g. Malin Bridge -> Halfway) */
     GROUPING = 'grouping',

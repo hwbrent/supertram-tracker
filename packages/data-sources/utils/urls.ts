@@ -1,3 +1,10 @@
+/**
+ * @summary A file containing enums containing URLs pertaining to each other module
+ * in the codebase
+ * @module classNames
+ */
+
+/** @see {@link module:routes} */
 export enum Routes {
     /** The base URL of the site */
     BASE = "https://bustimes.org",
