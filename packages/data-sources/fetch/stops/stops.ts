@@ -1,7 +1,9 @@
 import type { Route } from '../routes/routes.d';
+import { Routes as RoutesURLs } from '../../utils/urls';
+
 import type { Stop, Direction } from './stops.d';
 import { Stops as ClassNames } from '../../utils/classNames';
-import { Routes as RoutesURLs } from '../../utils/urls';
+
 import { fetchDocument } from '../../utils/helpers';
 
 /**

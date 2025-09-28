@@ -3,6 +3,7 @@ import fs from 'fs';
 import type { Route } from './routes.d';
 import { Routes as URLs } from '../../utils/urls';
 import { Routes as ClassNames } from '../../utils/classNames';
+
 import { fetchDocument } from '../../utils/helpers';
 
 /** @enum {string} */
