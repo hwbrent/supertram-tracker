@@ -3,7 +3,8 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 
 import type { Route } from './routes.d';
-import { URLs, ClassNames } from '../../utils/consts';
+import { URLs } from '../../utils/consts';
+import { Routes as ClassNames } from '../../utils/classNames';
 
 /** @enum {string} */
 const Paths = {
@@ -20,7 +21,7 @@ export async function fetchRoutes(): Promise<Route[]> {
     const document = dom.window.document;
 
     // There's a <ul> containing the routes called "services"
-    const [services] = document.getElementsByClassName(ClassNames.ROUTES_SERVICES);
+    const [services] = document.getElementsByClassName(ClassNames.SERVICES);
 
     // Within the <ul> is a list of items, where each item is a route
     const lis = Array.from(services?.children || []);
@@ -29,8 +30,8 @@ export async function fetchRoutes(): Promise<Route[]> {
         // also the name and description of the route
         const [anchor] = li.getElementsByTagName('a');
         const href = anchor?.href || '';
-        const name = li.getElementsByClassName(ClassNames.ROUTES_NAME)[0]?.textContent?.trim()|| '';
-        const description = li.getElementsByClassName(ClassNames.ROUTES_DESCRIPTION)[0]?.textContent?.trim() || '';
+        const name = li.getElementsByClassName(ClassNames.NAME)[0]?.textContent?.trim()|| '';
+        const description = li.getElementsByClassName(ClassNames.DESCRIPTION)[0]?.textContent?.trim() || '';
 
         // create a full URL
         const url = new URL(href, URLs.ROUTES_BASE);

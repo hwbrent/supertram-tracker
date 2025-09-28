@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 
 import type { Route } from '../routes/routes.d';
-import { ClassNames } from '../../utils/consts';
+import { Stops as ClassNames } from '../../utils/classNames';
 
 /**
  * 
@@ -16,7 +16,7 @@ async function fetchStops(route: Route) {
     const dom = new JSDOM(htmlString);
     const document = dom.window.document;
 
-    const groupings = Array.from(document.getElementsByClassName(ClassNames.STOPS_GROUPING));
+    const groupings = Array.from(document.getElementsByClassName(ClassNames.GROUPING));
 
     const directions = groupings.map((grouping) => {
         // get the title, and from it the termini of the route
@@ -24,7 +24,7 @@ async function fetchStops(route: Route) {
         const title = h2?.textContent?.trim() || '';
         const [from, to] = title.split(' - ').map((s) => s.trim());
 
-        const [timetable] = grouping.getElementsByClassName(ClassNames.STOPS_TIMETABLE);
+        const [timetable] = grouping.getElementsByClassName(ClassNames.TIMETABLE);
         const trs = Array.from(timetable.getElementsByTagName('tr'));
         const stops = trs
             .map((tr) => {
