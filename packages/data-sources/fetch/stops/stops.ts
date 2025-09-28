@@ -52,7 +52,7 @@ async function fetchStops(route: Route): Promise<Direction[]> {
                 const stop: Stop = { name, href, url };
                 return stop;
             })
-            .filter(Boolean);
+            .filter((stop): stop is Stop => stop !== null);
 
         const direction = {
             from,
