@@ -21,7 +21,7 @@ import { fetchDocument } from '../../utils/helpers';
 
 /** @enum {string} */
 const Paths = {
-    JSON: __dirname + '/routes.json'
+    JSON: __dirname + '/routes-cache.json'
 };
 
 // =================
