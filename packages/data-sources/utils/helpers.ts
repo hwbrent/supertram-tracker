@@ -33,19 +33,19 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
     } catch (error) {
         if (error instanceof AxiosError) {
             // check if there's a retry-after header
-            let retryAfter = Number(error.response?.headers['retry-after']);
-            if (!isNaN(retryAfter)) {
+            const retryAfterSecs = Number(error.response?.headers['retry-after']);
+            if (!isNaN(retryAfterSecs)) {
                 // the retry-after value is in seconds, so turn it into ms for use with
                 // setTimeout
-                retryAfter *= 1000;
+                const retryAfterMs = retryAfterSecs * 1000;
 
                 // add a bit of extra time to be safe
-                retryAfter += 10;
+                const retryAfterBuffered = retryAfterMs + 10;
 
-                console.warn(`Got 429 when fetching ${url}. Retrying after ${retryAfter}ms...`);
+                console.warn(`Got 429 when fetching ${url}, 'retry-after':'${retryAfterSecs}'\nRetrying after ${retryAfterBuffered}ms...`);
 
                 // wait for the amount of time specified by the response header
-                await new Promise((resolve) => setTimeout(resolve, retryAfter));
+                await new Promise((resolve) => setTimeout(resolve, retryAfterBuffered));
 
                 // retry fetching the url
                 return fetchDocument(url);
