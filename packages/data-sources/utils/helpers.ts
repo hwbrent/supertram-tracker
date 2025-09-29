@@ -29,7 +29,6 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
         htmlString = response.data;
         dom = new JSDOM(htmlString);
         document = dom.window.document;
-        console.log(`Successfully fetched ${url}`);
     } catch (error) {
         if (error instanceof AxiosError) {
             // check if there's a retry-after header
