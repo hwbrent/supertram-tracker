@@ -10,6 +10,7 @@
 
 import type { Route } from '../routes/routes.d';
 import { Routes as RoutesURLs } from '../../utils/urls';
+import { fetchRoutes } from '../routes/routes';
 
 import type { Stop, Direction } from './stops.d';
 import { Stops as ClassNames } from '../../utils/classNames';
@@ -141,14 +142,18 @@ async function augmentStop(stop: Stop): Promise<void> {
 // ============
 
 async function main() {
-    const route: Route = {
-        name: '',
-        description: '',
-        href: '',
-        url: new URL('https://bustimes.org/services/blue-malin-bridge-cathedral')
-    };
-    const directions = await fetchStops(route);
-    console.log(JSON.stringify(directions, null, 4));
+    const routes = await fetchRoutes();
+    const totalRoutes = routes.length;
+    for (const [i, route] of routes.entries()) {
+        const routeNumber = i + 1;
+        const counter = `[${routeNumber}/${totalRoutes}]`;
+        console.log(counter, 'start');
+
+        const directions = await fetchStops(route);
+        console.log(JSON.stringify(directions, null, 4));
+
+        console.log(counter, 'end');
+    }
 }
 
 if (require.main === module) {
