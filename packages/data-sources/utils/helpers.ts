@@ -29,14 +29,23 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
         htmlString = response.data;
         dom = new JSDOM(htmlString);
         document = dom.window.document;
+        console.log(`Successfully fetched ${url}`);
     } catch (error) {
-        // If we get a 429 with a retry-after value, wait however long it says to, and
-        // then try again
         if (error instanceof AxiosError) {
-            const retryAfter = Number(error.response?.headers['retry-after']);
+            // check if there's a retry-after header
+            let retryAfter = Number(error.response?.headers['retry-after']);
             if (!isNaN(retryAfter)) {
+                // the retry-after value is in seconds, so turn it into ms for use with
+                // setTimeout
+                retryAfter *= 1000;
+
+                console.warn(`Got 429 when fetching ${url}. Retrying after ${retryAfter}ms...`);
+
+                // wait for the amount of time specified by the response header
                 await new Promise((resolve) => setTimeout(resolve, retryAfter));
-                return fetchDocument(url); // retry
+
+                // retry fetching the url
+                return fetchDocument(url);
             }
         }
 
