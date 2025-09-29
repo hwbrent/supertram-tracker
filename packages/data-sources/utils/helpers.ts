@@ -39,6 +39,9 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
                 // setTimeout
                 retryAfter *= 1000;
 
+                // add a bit of extra time to be safe
+                retryAfter += 10;
+
                 console.warn(`Got 429 when fetching ${url}. Retrying after ${retryAfter}ms...`);
 
                 // wait for the amount of time specified by the response header
