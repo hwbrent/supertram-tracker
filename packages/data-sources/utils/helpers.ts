@@ -46,11 +46,13 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
         document = dom.window.document;
     } catch (error) {
         if (error instanceof AxiosError) {
+            const { response } = error;
+
             // check if there's a retry-after header
-            const retryAfterSecs = Number(error.response?.headers['retry-after']);
+            const retryAfterSecs = Number(response?.headers['retry-after']);
             if (!isNaN(retryAfterSecs)) {
                 // Add the error response to the responses array
-                responseNumber = responses.push(error.response);
+                responseNumber = responses.push(response);
 
                 // the retry-after value is in seconds, so turn it into ms for use with
                 // setTimeout
