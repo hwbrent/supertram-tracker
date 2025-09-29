@@ -60,7 +60,7 @@ export async function fetchRoutes(): Promise<Route[]> {
 /**
  * @returns routes from the JSON file
  */
-export default function getRoutes(): Route[] {
+export function getRoutes(): Route[] {
     const data = fs.readFileSync(Paths.JSON, 'utf-8');
     const routes = JSON.parse(data);
     return routes;
