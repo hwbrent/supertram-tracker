@@ -10,6 +10,16 @@
 import axios, { AxiosError } from 'axios';
 import { JSDOM } from 'jsdom';
 
+// ===============
+// === Globals ===
+// ===============
+
+/**
+ * @summary Responses from axios requests
+ * @type {import('axios').AxiosResponse}
+ */
+const responses = []
+
 // =================
 // === Functions ===
 // =================
@@ -22,10 +32,15 @@ import { JSDOM } from 'jsdom';
 export async function fetchDocument(url: URL|string): Promise<Document> {
     let document;
     let response;
+    let responseNumber;
     let htmlString;
     let dom;
     try {
+        // make the request and record it
         response = await axios.get(url.toString());
+        responseNumber = responses.push(response);
+
+        // Convert the response data to a Document object
         htmlString = response.data;
         dom = new JSDOM(htmlString);
         document = dom.window.document;
@@ -34,6 +49,9 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
             // check if there's a retry-after header
             const retryAfterSecs = Number(error.response?.headers['retry-after']);
             if (!isNaN(retryAfterSecs)) {
+                // Add the error response to the responses array
+                responseNumber = responses.push(error.response);
+
                 // the retry-after value is in seconds, so turn it into ms for use with
                 // setTimeout
                 const retryAfterMs = retryAfterSecs * 1000;
@@ -41,7 +59,7 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
                 // add a bit of extra time to be safe
                 const retryAfterBuffered = retryAfterMs + 10;
 
-                console.warn(`Got 429 when fetching ${url}, 'retry-after':'${retryAfterSecs}'\nRetrying after ${retryAfterBuffered}ms...`);
+                console.warn(`<${responseNumber}> Got 429 when fetching ${url}, 'retry-after':'${retryAfterSecs}'\nRetrying after ${retryAfterBuffered}ms...`);
 
                 // wait for the amount of time specified by the response header
                 await new Promise((resolve) => setTimeout(resolve, retryAfterBuffered));
