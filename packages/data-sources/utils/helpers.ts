@@ -46,11 +46,12 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
         document = dom.window.document;
     } catch (error) {
         if (error instanceof AxiosError) {
-            const { response } = error;
+            const { response, status, code } = error;
 
             // check if there's a retry-after header
             const retryAfterSecs = Number(response?.headers['retry-after']);
-            if (!isNaN(retryAfterSecs)) {
+            const hasRetryAfter = !isNaN(retryAfterSecs);
+            if (status === 429 && hasRetryAfter) {
                 // Add the error response to the responses array
                 responseNumber = responses.push(response);
 
@@ -61,7 +62,15 @@ export async function fetchDocument(url: URL|string): Promise<Document> {
                 // add a bit of extra time to be safe
                 const retryAfterBuffered = retryAfterMs + 10;
 
-                console.warn(`<${responseNumber}> Got 429 when fetching ${url}, 'retry-after':'${retryAfterSecs}'\nRetrying after ${retryAfterBuffered}ms...`);
+                const message = [
+                    `<${responseNumber}>`,
+                    `    ${status}`,
+                    `    ${code}`,
+                    `    ${url}`,
+                    `    'retry-after':'${retryAfterSecs}'`,
+                    `</${responseNumber}>`
+                ].join('\n');
+                console.warn(message);
 
                 // wait for the amount of time specified by the response header
                 await new Promise((resolve) => setTimeout(resolve, retryAfterBuffered));
